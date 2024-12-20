@@ -5,94 +5,7 @@ from typing import Optional
 import math
 import datetime
 
-def print_tool_call(tool_name: str, arguments: dict, result: str):
-    """
-    Prints a nicely formatted output whenever a tool is called as to show the tool call and result. (does not work with parallel calls)
-    
-    Args:
-        tool_name: Name of the tool that was called.
-        arguments: A dictionary of arguments passed to the tool.
-        result: The result or outcome from the tool.
-    """
-    # ANSI color codes
-    BLUE = '\033[94m'
-    GREEN = '\033[92m'
-    YELLOW = '\033[93m'
-    RESET = '\033[0m'
-    BOLD = '\033[1m'
-    
-    def get_display_length(s: str) -> int:
-        """Calculate display length accounting for emoji width"""
-        emoji_width = {
-            '🔧': 3,  # wrench
-            '📝': 3,  # memo
-            '📊': 3,  # chart
-            '•': 2,   # bullet
-        }
-        
-        # Check if string contains any emoji
-        has_emoji = any(emoji in s for emoji in emoji_width)
-        
-        # Remove ANSI color codes for length calculation
-        s_clean = s
-        for color in [BLUE, GREEN, YELLOW, RESET, BOLD]:
-            s_clean = s_clean.replace(color, '')
-        
-        length = 0
-        i = 0
-        while i < len(s_clean):
-            for emoji, width in emoji_width.items():
-                if s_clean.startswith(emoji, i):
-                    length += width
-                    i += len(emoji)
-                    break
-            else:
-                length += 1
-                i += 1
-                
-        # Add 1 to length if no emoji present
-        if not has_emoji:
-            length += 1
-            
-        return length
-
-    # Calculate required width based on content
-    content_lines = [f"🔧 TOOL CALLED: {BLUE}{tool_name}{RESET}", f"📝 ARGUMENTS:"]
-    for key, value in arguments.items():
-        content_lines.append(f"• {YELLOW}{key}{RESET}: {value}")
-    content_lines.append("📊 RESULT:")
-    if result.strip():
-        content_lines.extend([f"{GREEN}{line}{RESET}" for line in result.splitlines()])
-    
-    # Calculate width based on longest line
-    width = max(get_display_length(line) for line in content_lines)
-    width = max(width + 4, 70)  # Add minimal padding and ensure minimum width
-    
-    def print_line(content=""):
-        """Print a line with proper padding accounting for emoji width"""
-        display_length = get_display_length(content)
-        padding = width - display_length
-        print(f"│ {content}{' ' * padding}│")
-    
-    # Box drawing characters with bold
-    h_line = "─" * width
-    box_style = BOLD
-    
-    # Print the box
-    print(f"\n{box_style}┌{h_line}┐{RESET}")
-    print_line(f"🔧 {BLUE}TOOL CALLED: {tool_name}{RESET}")
-    print(f"{box_style}├{h_line}┤{RESET}")
-    print_line(f"📝 ARGUMENTS:")
-    for key, value in arguments.items():
-        print_line(f"• {YELLOW}{key}{RESET}: {value}")
-    print(f"{box_style}├{h_line}┤{RESET}")
-    print_line(f"📊 RESULT:")
-    if result.strip():
-        for line in result.splitlines():
-            print_line(f"{GREEN}{line}{RESET}")
-    else:
-        print_line(f"{GREEN}None{RESET}")
-    print(f"{box_style}└{h_line}┘{RESET}\n")
+from llm_tools.conversation_printers import print_tool_call, print_role_response
 
 def convert_miles_to_km(miles: float) -> float:
     """
@@ -143,8 +56,6 @@ def calculate_travel_time(distance_km: float, speed_kmh: float, start_time: Opti
     print_tool_call("calculate_travel_time", {"distance_km": distance_km, "speed_kmh": speed_kmh, "start_time": start_time}, result)
     return result
 
-
-
 if __name__ == "__main__":
     converter = ToolConverter()
     # Include your custom function
@@ -154,7 +65,7 @@ if __name__ == "__main__":
     schemas = converter.generate_schemas(functions)
 
     # Create LLM client
-    openai_client = OpenAIAPI(model_name="gpt-4o-mini")
+    openai_client = OpenAIAPI(model_name="gpt-4o")
 
     # Use the handler
     llm_handler = LLMHandler(openai_client)
@@ -162,11 +73,15 @@ if __name__ == "__main__":
     llm_handler.set_tools(schemas["openai"])
 
     # Set system instructions (optional)
-    llm_handler.set_system_prompt("You are a helpfull assitant that use")
-
+    llm_handler.set_system_prompt("You are a helpfull friendly assitant that has the ability to use tools to help you answer questions and solve problems.")
+    
     # Send user message
-    response = llm_handler.send_user_message("If I travel 500 km at 100 km/h, how long will it take?")
-    print(f"\nLLM Response (openai):\n{response}\n")
+    user_query = "If I travel 500 km at 100 km/h, how long will it take?"
+    print_role_response(user_query, "user")
+    response = llm_handler.send_user_message(user_query)
+    print_role_response(response, "agent")
 
-    response = llm_handler.send_user_message("If I go 330 miles at 95 miles/hour departing at 9:00, what time will I arrive? ")
-    print(f"\nLLM Response (openai):\n{response}\n")
+    user_query = "If I go 330 miles at 85 miles/hour departing at 9:00, what time will I arrive? And how long if i go 88 miles/hour?"
+    print_role_response(user_query, "user")
+    response = llm_handler.send_user_message(user_query)
+    print_role_response(response, "agent")

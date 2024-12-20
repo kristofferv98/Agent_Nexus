@@ -6,7 +6,14 @@ Welcome to this multi-LLM tool integration codebase! This repository provides a 
 - Connects with multiple LLMs (OpenAI, Anthropic, Gemini, and Groq) through a uniform interface.  
 - Transparently handles the logic of how messages, tool calls, and responses are processed.  
 
-Below, you’ll find a high-level overview of each component, instructions on setting up and running the project, and tips for extending it with your own functions and logic.
+It showcase use of tools dynamically generated from python functions. In the main script with optional conversation printers, that supports parallel tool calls, and showcases how to setup tools only providing them as a list of functions to the LLMHandler.
+
+Example images of conversations with the LLM printers and the main script can be seen below:
+
+![Example of a simple conversation showing tool calls and responses](images/simple_conversation.png)
+![Example showing parallel and chained tool calls working together](images/parallel_tool_calls.png)
+
+Below, you'll find a high-level overview of each component, instructions on setting up and running the project, and tips for extending it with your own functions and logic.
 
 ---
 
@@ -46,6 +53,9 @@ Here’s a simplified structure of the repository:
 
 ```
 .
+├── images/
+│   └── parallel_tool_calls.png  # Example of conversation
+│   └── simple_conversation.png  # Example of conversation
 ├── functions/
 │   └── math_tools.py         # Example math functions (tools)
 ├── llm_api/
@@ -57,6 +67,7 @@ Here’s a simplified structure of the repository:
 ├── llm_tools/
 │   ├── llm_handler.py        # Main orchestrator class for LLM usage
 │   └── message_handler.py    # Handles message creation and formatting
+│   └── conversation_printers.py # Handles printing the conversation
 ├── tool_converter.py         # ToolConverter: generates JSON schemas
 └── main.py                   # Example driver script that ties everything together
 ```
