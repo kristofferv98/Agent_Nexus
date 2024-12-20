@@ -207,7 +207,7 @@ if __name__ == "__main__":
 
     # Generate schemas
     schemas = converter.generate_schemas(functions)
-    print("Schemas:", schemas["gemini"])  # Example: print the OpenAI schema
+    print("Schemas:", schemas["gemini"])  # Example: print the Gemini schema
 
     # Create LLM client
     gemini_client = GeminiAPI(model_name="gemini-2.0-flash-exp")
