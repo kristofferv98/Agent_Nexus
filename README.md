@@ -1,21 +1,27 @@
 # Multi-LLM Tool Integration Codebase
 
-Welcome to this multi-LLM tool integration codebase! This repository provides a system that meets the following goals:
+Welcome to this multi-LLM tool integration codebase! This repository provides a powerful system for integrating Python functions with various LLM providers like OpenAI, Anthropic, Gemini, and Groq.
 
-- Dynamically generates and transforms JSON schemas for Python functions (so that various Large Language Model (LLM) providers can read and call them).  
-- Connects with multiple LLMs (OpenAI, Anthropic, Gemini, and Groq) through a uniform interface.  
-- Transparently handles the logic of how messages, tool calls, and responses are processed.  
+## Key Features
 
-It showcase use of tools dynamically generated from python functions. In the main script with optional conversation printers, that supports parallel tool calls, and showcases how to setup tools only providing them as a list of functions to the LLMHandler.
+- **Dynamic Schema Generation**: Automatically converts Python functions into JSON schemas compatible with major LLM providers
+- **Multi-LLM Support**: Seamlessly connects with OpenAI, Anthropic, Gemini, and Groq through a unified interface
+- **Transparent Processing**: Handles all message flows, tool calls, and responses dynamiclly by passing in functions you want to use
 
-Example images of conversations with the LLM printers and the main script can be seen below:
 
-![Example of a simple conversation showing tool calls and responses](images/simple_conversation.png)
-![Example showing parallel and chained tool calls working together](images/parallel_tool_calls.png)
+The system allows you to easily create tools from Python functions and use them with the supported LLM providers. It includes features like parallel tool execution, conversation logging, and a simple interface for registering new functions.
 
-Below, you'll find a high-level overview of each component, instructions on setting up and running the project, and tips for extending it with your own functions and logic.
+##### Example of a parallel and chained tool calls in the main script (with a christmas theme🎄):
+![Parallel and Chained Tool Calls](images/conversation_parallel_tool_calls.png)
+*Example showing parallel and chained tool calls working together*
 
----
+## Getting Started
+
+This documentation will guide you through:
+- Understanding the system architecture
+- Setting up your environment
+- Implementing your own tools
+- Integrating with different LLM providers
 
 ## Table of Contents
 

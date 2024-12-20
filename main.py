@@ -16,7 +16,7 @@ def convert_miles_to_km(miles: float) -> float:
 
 def calculate_travel_time(distance_km: float, speed_kmh: float, start_time: Optional[str] = None) -> str:
     """
-    Calculates travel time in hours, and provides departure time and arrival time
+    Calculates travel time in days, hours, and minutes, and provides departure time and arrival time
     based on a distance, speed, and an optional starting time.
 
     Args:
@@ -29,27 +29,35 @@ def calculate_travel_time(distance_km: float, speed_kmh: float, start_time: Opti
         A string containing the calculated travel time, and estimated arrival
         time if the start time is provided, or a error message.
     """
-
     if speed_kmh <= 0:
         return "Speed must be a positive number."
     if distance_km < 0:
         return "Distance must be a non-negative number."
 
     travel_hours = distance_km / speed_kmh
-    hours = math.floor(travel_hours)
-    minutes = math.ceil((travel_hours - hours) * 60)
+    days = math.floor(travel_hours / 24)
+    remaining_hours = travel_hours % 24
+    hours = math.floor(remaining_hours)
+    minutes = math.ceil((remaining_hours - hours) * 60)
 
-    result = f"The travel time is approximately {hours} hours and {minutes} minutes."
+    result = ""
+    if days > 0:
+        result += f"{days} days, "
+    result += f"{hours} hours and {minutes} minutes"
+    result = f"The travel time is approximately {result}."
 
     if start_time:
         try:
             start_datetime = datetime.datetime.strptime(start_time, "%H:%M")
-            arrival_datetime = start_datetime + datetime.timedelta(hours=hours, minutes=minutes)
+            arrival_datetime = start_datetime + datetime.timedelta(days=days, hours=hours, minutes=minutes)
             arrival_time = arrival_datetime.strftime("%H:%M")
             result += (
                 f"\nDeparting at {start_time}, "
-                f"the arrival time is estimated to be at: {arrival_time}."
+                f"the arrival time is estimated to be at: {arrival_time}"
             )
+            if days > 0:
+                result += f" ({'+' + str(days) + ' days' if days == 1 else '+' + str(days) + ' days'})"
+            result += "."
         except ValueError:
             return "Invalid start time format. Please use HH:MM for time."
 
@@ -73,15 +81,9 @@ if __name__ == "__main__":
     llm_handler.set_tools(schemas["openai"])
 
     # Set system instructions (optional)
-    llm_handler.set_system_prompt("You are a helpfull friendly assitant that has the ability to use tools to help you answer questions and solve problems.")
+    llm_handler.set_system_prompt("You are a helpfull friendly assitant christmas elf that has the ability to use tools to help you answer questions to the user. You are charefull and polite, since its now christmas time.")
     
-    # Send user message
-    user_query = "If I travel 500 km at 100 km/h, how long will it take?"
-    print_role_response(user_query, "user")
-    response = llm_handler.send_user_message(user_query)
-    print_role_response(response, "agent")
-
-    user_query = "If I go 330 miles at 85 miles/hour departing at 9:00, what time will I arrive? And how long if i go 88 miles/hour?"
+    user_query = "Santa needs to deliver presents around the Earth's circumference (approximately 24,901 miles) at his magical sleigh speed of 2,000 miles per hour, leaving the North Pole at 00:00 on Christmas Eve. When will he complete his journey? And if the reindeers get tired halfway and can only operate at half speed for the rest of the journey, will he still make it?🎄✨"
     print_role_response(user_query, "user")
     response = llm_handler.send_user_message(user_query)
     print_role_response(response, "agent")
