@@ -75,7 +75,9 @@ Here’s a simplified structure of the repository:
 │   └── message_handler.py    # Handles message creation and formatting
 │   └── conversation_printers.py # Handles printing the conversation
 ├── tool_converter.py         # ToolConverter: generates JSON schemas
+├── main_test.py.             # A test example for all llm providers testing paralell and chained tools
 └── main.py                   # Example driver script that ties everything together
+
 ```
 
 ---
@@ -84,8 +86,8 @@ Here’s a simplified structure of the repository:
 
 1. Clone this repository:  
    ```bash
-   git clone https://github.com/your-org/your-repo.git
-   cd your-repo
+   git clone https://github.com/kristofferv98/Agent_Nexus.git
+   cd Agent_nexus
    ```
 
 2. Create and activate a virtual environment (optional, but recommended):  
@@ -99,9 +101,13 @@ Here’s a simplified structure of the repository:
    pip install -r requirements.txt
    ```
 
-4. Set your environment variables for LLM provider credentials (e.g., OPENAI_API_KEY, ANTHROPIC_API_KEY, GEMINI_API_KEY, GROQ_API_KEY).  
-
-5. (Optional) If running on macOS with M2, you can ensure any specialized dependencies (like Rosetta, if needed) are properly configured.
+4. Set your desieres environment variables for LLM provider credentials (e.g., OPENAI_API_KEY, ANTHROPIC_API_KEY, GEMINI_API_KEY, GROQ_API_KEY). 
+   ```bash
+   export OPENAI_API_KEY= "your-api-key"
+   export ANTHROPIC_API_KEY= "your-api-key"
+   export GEMINI_API_KEY= "your-api-key"
+   export GROQ_API_KEY= "your-api-key"
+   ```
 
 ---
 
@@ -109,7 +115,7 @@ Here’s a simplified structure of the repository:
 
 ### Generating JSON Schemas with ToolConverter
 
-The ToolConverter takes in a list of Python functions and generates a schema that the LLM can use to understand arguments, parameter validation, and usage.
+The ToolConverter takes in a list of Python functions and generates a schema that the LLM can use to understand arguments, parameter validation, and usage. (uses openai gpt-4o to genrate schemas for all functions in paralell)
 
 You’ll find an example in:
 ```python
@@ -123,7 +129,7 @@ When you provide a list of functions (e.g., [subtract_numbers, add_numbers, mult
 
 ### Registering Functions with LLMHandler
 
-The LLMHandler manages the conversation loop. Whenever the LLM attempts to call a tool, LLMHandler intercepts the request and calls the actual Python code.
+The LLMHandler manages the conversation loop. Whenever the LLM attempts to call a tool, LLMHandler intercepts the request and calls the actual Python code. Unified for all llms.
 
 For example, in:
 ```python
@@ -142,15 +148,22 @@ By calling `register_functions([your_func_1, your_func_2])`, you make those tool
 An example usage is in “main.py”. It:
 
 1. Initializes ToolConverter.  
-2. Gathers your tools (e.g., math functions).  
+2. Gathers your tools (e.g., travel time functions).  
 3. Generates the schemas for all LLM flavors.  
 4. Instantiates an LLM client (e.g., OpenAI) and an LLMHandler.  
 5. Registers the tools and sets the system prompt.  
 6. Sends user messages to the LLM, which can call the newly registered tools as needed.  
+7. Returns a final answer after tool execution
 
 You can run:  
 ```bash
 python main.py
+```
+
+### Running Main Test script (testing all llm providers):
+You can run:  
+```bash
+python main_test.py
 ```
 Adjust the flags in the script (run_openai, run_anthropic, run_groq, run_gemini) to choose which LLM(s) to test.
 
@@ -170,10 +183,11 @@ def greet_user(name: str) -> str:
     return f"Hello, {name}!"
 ```
 Add it to the code flow in “main.py” (or another script) similarly to how math_tools are used.
+If complex or complex logic create simple abstractions of more complex functions to simplify schema generation
 
 ---
 
-## Details of Each Module
+## Details of most relevant Modules
 
 1. **tool_converter.py**  
    - Responsible for converting Python functions into JSON schemas.  
